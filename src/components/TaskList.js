@@ -14,6 +14,7 @@ export default function TaskList() {
 
 
   useEffect( async () => {
+    console.log("rerender from use effect")
     getTasks()
     getAssignees()
   }, [selectedProject, selectedTask])
@@ -69,6 +70,7 @@ export default function TaskList() {
 
   return (
   <div className="task-list container">
+    
       {displayTasks(tasks)}
       <Taskform addTask={addTask}/>
 

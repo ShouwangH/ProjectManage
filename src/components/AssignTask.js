@@ -1,41 +1,29 @@
 import React, { useEffect, useState } from 'react';
+import { Typeahead } from 'react-bootstrap-typeahead'
+
+import {doc, getFirestore, updateDoc} from 'firebase/firestore'
 
 export default function AssignTask(props) {
     
-    const [assignee, setAssignee] = useState('')
+    const [assignee, setAssignee] = useState("")
 
-    const autocomplete = (e) => {
-        console.log(e.target.value)
-        let proper = [];
-        props.users.forEach(name => {
-            proper.push(name.firstname.concat(" ",name.lastname))
-        })
-        return (
-        <div id="assign-autocomplete-list" className="autocomplete-items">
-            {proper.map(person => {if (person.substr(0,e.target.value.length).toUpperCase() === e.target.value.toUpperCase()) {
-                <div onClick={setAssignee(person)}>
-                    <strong>{person.substr(0,e.target.value.length)}</strong>{person.substr(e.target.value.length)}
-                    <input type ="hidden" value ={person}/>
-                </div>
-            }
-
-            })} 
-        </div>
-        )
+    const assignTask = async (input) => {  
+      const db = getFirestore()
+      const docref = doc(db, "tasks", props.task.id)
+      await updateDoc(docref, {
+        assignedto:assignee
+    })
+      setAssignee(input[0].userid)
     }
-
-
-    
-
+        
 
   return (
-      <div>
-          <form onSubmit={autocomplete}>
-              <div className="autocomplete">
-                  <input id="assignto" type="text" name="assignto" placeholder="Assignee" value = {assignee} onChange={ e =>autocomplete()}/>
-              </div>
-          </form>
-      </div>
+      <Typeahead
+      id="assign-to-user"
+      onChange={(input)=>{assignTask(input)}}
+      labelKey={option =>  `${option.firstname} ${option.lastname}`}
+      options={props.users}
+      placeholder="Please Assign Task"
+      />
 
-  );
-}
+  )}
