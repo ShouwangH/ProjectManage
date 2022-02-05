@@ -12,9 +12,11 @@ export default function Taskform(props) {
     }
 
     return (
+      <div className="row">
       <form id ="add-task=form" onSubmit={submit}>
-        <input type="text" className = "input" value = {name} onChange={e => setName(e.target.value)}/>
+        <input type="text" className = "input col-8 align-self-end" placeholder = "Add task here..." value = {name} onChange={e => setName(e.target.value)}/>
       </form>
+      </div>
     )
     }
 

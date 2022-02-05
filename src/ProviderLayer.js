@@ -8,8 +8,8 @@ import { SelectedTaskContext, SelectedProjectContext } from './context';
 
 export default function ProviderLayer() {
 
-    const [selectedTask, setSelectedTask] = useState("")
-    const [selectedProject, setSelectedProject] = useState("")
+    const [selectedTask, setSelectedTask] = useState("assignedto")
+    const [selectedProject, setSelectedProject] = useState('')
     
     const db = getFirestore(useFirebaseApp())
     const auth = getAuth(useFirebaseApp())

@@ -26,7 +26,7 @@ export default function AddProject() {
     <>
     <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProjectModal"> Add Project </button>
 
-    <div className="modal fade" id="addProjectModal" tabindex="-1" aria-labelledby="addProjectModal" aria-hidden="true">
+    <div className="modal fade" id="addProjectModal" tabIndex="-1" aria-labelledby="addProjectModal" aria-hidden="true">
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
@@ -34,13 +34,13 @@ export default function AddProject() {
             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div className="modal-body">
-          <form id ="add-task=form" onSubmit={submit}>
+          <form id ="add-project-form-sidebar" onSubmit={submit}>
         <input type="text" className = "input" value = {name} onChange={e => setName(e.target.value)}/>
       </form>
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" className="btn btn-primary">Create Project</button>
+            <button type="submit" className="btn btn-primary">Create Project</button>
           </div>
         </div>
       </div>

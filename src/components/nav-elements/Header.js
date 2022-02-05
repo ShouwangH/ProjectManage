@@ -2,7 +2,7 @@ import React, {useState, useContext} from 'react';
 import { addDoc,getFirestore, collection, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { SelectedTaskContext, SelectedProjectContext } from '../../context';
 
-export default function Header() {
+export default function Header(props) {
   const [projectName, setProjectName] = useState()
   const [taskName, setTaskName] = useState()
   const {setSelectedTask} = useContext(SelectedTaskContext)
@@ -11,9 +11,8 @@ export default function Header() {
   const submitProject = sp => {
     sp.preventDefault()
     if (!projectName) return
-    addPro(projectName)
-    setSelectedProject(projectName)
-    setProjectName("")
+    const id = addPro(projectName)
+    setSelectedProject({name:projectName,projectid:id})
   }
 
   const addPro = async (item) => {
@@ -23,8 +22,21 @@ export default function Header() {
       projectid:docref.id, 
       timestamp: serverTimestamp()
     })
+    setProjectName("")
+    return docref.id
+
   }
-  
+
+  const toggleLogin = () => {
+    if (!props.displayLogin) {
+    props.handleDisplay()
+}}
+
+  const toggleRegister = () => {
+    if (props.displayLogin) {
+    props.handleDisplay()
+  }}
+   
  
   
   const submitTask = st => {
@@ -32,13 +44,13 @@ export default function Header() {
     console.log(st)
     if (!taskName) return
     addTask(taskName)
-    setSelectedTask(taskName)
+    setSelectedTask("createdby")
     setTaskName("")
   }
 
   const addTask = async (item) => {
     const db = getFirestore()
-    const docref = await addDoc(collection(db,"tasks"), {name:item, createdby:"DTZ0aOCLQxv09MSuRqvH", completed:false})
+    const docref = await addDoc(collection(db,"tasks"), {name:item, createdby:props.currentUser.userId, completed:false})
     await updateDoc(docref, {
       id:docref.id, 
       timestamp: serverTimestamp()
@@ -51,29 +63,42 @@ export default function Header() {
     <div>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <div className="container-fluid">
-          <a className="navbar-brand" href="#">Navbar</a>
-          <div className="dropdown">
+          <div>
+          <a className="navbar-brand" href="#">Shouwang's Productivity App</a>
+          {props.currentUser && (
+          <span className="dropdown">
             <button className="btn btn-secondary" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
               +
             </button>
+            
             <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
               <li><a className="dropdown-item" data-bs-toggle="modal" data-bs-target="#addProjectModal" href="#">Add Project</a></li>
               <li><a className="dropdown-item" data-bs-toggle="modal" data-bs-target="#addTaskModal" href="#">Add Task</a></li>
             </ul>
+            
+          </span>
+          ) }
           </div>
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            </ul>
-            <form className="d-flex">
-              <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-              <button className="btn btn-outline-success" type="submit">Search</button>
-            </form>
-          </div>
+          <div className="navbar-text">
+              {
+                props.currentUser ? (
+                  <>
+                  <span className="nav-item"><span>Welcome, {`${props.currentUser.firstName} ${props.currentUser.lastName}`} </span></span>
+                  <span className="nav-item" onClick={()=>{props.logOut()}}>Logout</span>
+                  </>
+                ) : (
+                  <>
+                  <span className="nav-item" onClick={()=>{toggleLogin()}}>Login </span>
+                  <span className="nav-item" onClick={()=>{toggleRegister()}}>Register </span>
+                  </>
+                )
+              }
+            </div>
         </div>
       </nav>
     </div>
 
-<div className="modal fade" id="addProjectModal" tabindex="-1" aria-labelledby="addProjectModal" aria-hidden="true">
+<div className="modal fade" id="addProjectModal" tabIndex="-1" aria-labelledby="addProjectModal" aria-hidden="true">
 <div className="modal-dialog">
   <div className="modal-content">
     <div className="modal-header">
@@ -81,19 +106,19 @@ export default function Header() {
       <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
     <div className="modal-body">
-    <form id ="add-task=form" onSubmit={submitProject}>
-  <input type="text" className = "input" value = {projectName} onChange={sp => setProjectName(sp.target.value)}/>
+    <form id ="add-project-form" onSubmit={submitProject}>
+  <input type="text" className = "input" value = {projectName} placeholder="What is the project name" onChange={sp => setProjectName(sp.target.value)}/>
 </form>
     </div>
     <div className="modal-footer">
       <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      <button type="button" className="btn btn-primary" data-dismiss="modal">Create Project</button>
+      <button type="submit" className="btn btn-primary" data-bs-dismiss="modal" onClick={submitProject}>Create Project</button>
     </div>
   </div>
 </div>
 </div>
 
-<div className="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModal" aria-hidden="true">
+<div className="modal fade" id="addTaskModal" tabIndex="-1" aria-labelledby="addTaskModal" aria-hidden="true">
 <div className="modal-dialog">
   <div className="modal-content">
     <div className="modal-header">
@@ -101,13 +126,13 @@ export default function Header() {
       <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
     <div className="modal-body">
-    <form id ="add-task=form" onSubmit={submitTask}>
-  <input type="text" className = "input" value = {taskName} onChange={st => setTaskName(st.target.value)}/>
+    <form id ="add-task-form" onSubmit={submitTask}>
+  <input type="text" className = "input" value = {taskName} placeholder= "Add Task" onChange={st => setTaskName(st.target.value)}/>
 </form>
     </div>
     <div className="modal-footer">
       <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      <button type="button" className="btn btn-primary" data-dismiss="modal">Create Task</button>
+      <button type="submit" className="btn btn-primary" data-bs-dismiss="modal" onClick={submitTask}>Create Task</button>
     </div>
   </div>
 </div>

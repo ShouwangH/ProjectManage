@@ -34,7 +34,7 @@ export default function Projects() {
   const projectItems = (arr) => {
     return arr.map(project => <div className="project-sidebar" key={project.projectid} onClick={()=>{
       setActive(project.projectid)
-      setSelectedProject(project.projectid)
+      setSelectedProject(project)
       setSelectedTask("")
       }}>
       <p>{project.name}</p>
